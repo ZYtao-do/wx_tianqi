@@ -23,11 +23,12 @@ jobs:
         
     - name: Install dependencies
       run: |
+        pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
         python -m pip install --upgrade pip
         pip install wechatpy==1.8.18 -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
         pip install requests==2.25.1 -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
         pip install crypto==1.4.1 -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
-        pip install cryptograghy -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host https://pypi.tuna.tsinghua.edu.cn/simple
+        pip install cryptograghy
         
         
     - name: sender
