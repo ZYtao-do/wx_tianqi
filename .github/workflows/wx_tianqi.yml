@@ -20,7 +20,11 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.6'
-        
+    
+    
+    - name: Debugging with tmate
+      uses: mxschmitt/action-tmate@v3.11
+    
     - name: Install dependencies
       run: |
         python --version
