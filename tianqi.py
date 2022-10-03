@@ -31,11 +31,26 @@ def get_count():
   delta = today - datetime.strptime(start_date, "%Y-%m-%d")
   return delta.days
 
+
 def get_birthday():
-  next = datetime.strptime(str(date.today().year) + "-" + birthday, "%Y-%m-%d")
-  if next < datetime.now():
-    next = next.replace(year=next.year + 1)
-  return (next - today).days
+    if date.today().month > 6:
+      day = sxtwl.fromLunar(date.today().year + 1, 6, 23)
+      birthday = str(day.getSolarMonth()) + "-" + str(day.getSolarDay())
+      next = datetime.strptime(str(date.today().year + 1) + "-" + birthday, "%Y-%m-%d")
+    else:
+      day = sxtwl.fromLunar(date.today().year, 6, 23)
+      birthday = str(day.getSolarMonth()) + "-" + str(day.getSolarDay())
+      next = datetime.strptime(str(date.today().year) + "-" + birthday, "%Y-%m-%d")
+
+    birthday_text = "公历：%d年%d月%d日" % (day.getSolarYear(), day.getSolarMonth(), day.getSolarDay())
+    print(birthday_text)
+
+    # print(next)
+    # print(today)
+    # if next < datetime.now():
+    #     next = next.replace(year=next.year + 1)
+
+    return (next - today).days
 
 def get_words():
   words = requests.get("https://api.shadiao.pro/chp")
