@@ -1,4 +1,4 @@
 requests==2.25.1
 wechatpy==1.8.18
 crypto==1.4.1
-cryptograghy==3.3.2
+cryptograghy
