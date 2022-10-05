@@ -23,25 +23,25 @@ template_id = os.environ["TEMPLATE_ID"]
 
 
 def get_weather():
-  url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
-  res = requests.get(url).json()
-  weather = res['data']['list'][0]
-  return weather['airQuality'], weather['weather'], math.floor(weather['temp']), weather['humidity'], weather['wind']
+    url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
+    res = requests.get(url).json()
+    weather = res['data']['list'][0]  # 今天
+    weather1 = res['data']['list'][1]  # 明天
+    weather2 = res['data']['list'][2]  # 后天
 
-def get_count():
-  delta = today - datetime.strptime(start_date, "%Y-%m-%d")
-  return delta.days
+    return weather['airQuality'], weather['weather'], math.floor(weather['temp']), weather['humidity'], weather['wind'], \
+           weather['low'], weather['high']
 
 
 def get_birthday():
     if date.today().month > 6:
-      day = sxtwl.fromLunar(date.today().year + 1, 6, 23)
-      birthday = str(day.getSolarMonth()) + "-" + str(day.getSolarDay())
-      next = datetime.strptime(str(date.today().year + 1) + "-" + birthday, "%Y-%m-%d")
+        day = sxtwl.fromLunar(date.today().year + 1, 6, 23)
+        birthday = str(day.getSolarMonth()) + "-" + str(day.getSolarDay())
+        next = datetime.strptime(str(date.today().year + 1) + "-" + birthday, "%Y-%m-%d")
     else:
-      day = sxtwl.fromLunar(date.today().year, 6, 23)
-      birthday = str(day.getSolarMonth()) + "-" + str(day.getSolarDay())
-      next = datetime.strptime(str(date.today().year) + "-" + birthday, "%Y-%m-%d")
+        day = sxtwl.fromLunar(date.today().year, 6, 23)
+        birthday = str(day.getSolarMonth()) + "-" + str(day.getSolarDay())
+        next = datetime.strptime(str(date.today().year) + "-" + birthday, "%Y-%m-%d")
 
     birthday_text = "公历：%d年%d月%d日" % (day.getSolarYear(), day.getSolarMonth(), day.getSolarDay())
     print(birthday_text)
@@ -53,28 +53,40 @@ def get_birthday():
 
     return (next - today).days
 
+
 def get_words():
-  words = requests.get("https://api.shadiao.pro/chp")
-  if words.status_code != 200:
-    return get_words()
-  return words.json()['data']['text']
+    words = requests.get("https://api.shadiao.pro/chp")
+    if words.status_code != 200:
+        return get_words()
+    return words.json()['data']['text']
+
 
 def get_random_color():
-  return "#%06x" % random.randint(0, 0xFFFFFF)
+    return "#%06x" % random.randint(0, 0xFFFFFF)
+
 
 def get_jsyyh():
-  url = "http://open.iciba.com/dsapi/"
-  word = requests.get(url)
-  content = word.json()["content"]
-  note = word.json()["note"]
-  return content, note
-  
+    url = "http://open.iciba.com/dsapi/"
+    word = requests.get(url)
+    content = word.json()["content"]
+    note = word.json()["note"]
+    return content, note
+
 
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
-airquality, wea, temperature, humidity, wind = get_weather()
+airquality, wea, temperature, humidity, wind, low, high = get_weather()
+tem = str(low) + "~" + str(high) + " ℃"
+print(tem)
 eng, chinese = get_jsyyh()
-data = {"airquality":{"value":airquality}, "weather":{"value":wea}, "temperature":{"value":temperature}, "humidity":{"value":humidity}, "wind":{"value":wind}, "birthday_left":{"value":get_birthday()},"eng":{"value":eng, "color":get_random_color()}, "chinese":{"value":chinese}, "words":{"value":get_words(), "color":get_random_color()}}
+birthday_left = str(get_birthday())
+data = {"airquality": {"value": airquality}, "weather": {"value": wea},
+        "temperature": {"value": tem, "color": get_random_color()}, "humidity": {"value": humidity},
+        "wind": {"value": wind}, "birthday": {"value": birthday_left, "color": get_random_color()},
+        "eng": {"value": eng, "color": get_random_color()}, "chinese": {"value": chinese},
+        "words": {"value": get_words(), "color": get_random_color()}}
+
+print(data)
 res = wm.send_template(user_id, template_id, data)
 print(res)
