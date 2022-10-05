@@ -1,4 +1,4 @@
-name: wx_tianqi
+name: wx_tianqi1
 on:
   schedule:
   - cron:  '56 22 * * *'
