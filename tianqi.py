@@ -25,11 +25,15 @@ template_id = os.environ["TEMPLATE_ID"]
 def get_weather():
     url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
     res = requests.get(url).json()
-    weather = res['data']['list'][0]  # 今天
-    weather1 = res['data']['list'][1]  # 明天
-    weather2 = res['data']['list'][2]  # 后天
+    current_hour = datetime.now().hour
 
-    return weather['airQuality'], weather['weather'], math.floor(weather['temp']), weather['humidity'], weather['wind'], \
+    if current_hour <= 12:
+        weather = res['data']['list'][0]  # 今天
+    elif current_hour > 12:
+        weather = res['data']['list'][1]  # 明天
+        weather1 = res['data']['list'][2]  # 后天
+
+    return weather['airQuality'], weather['weather'], weather['humidity'], weather['wind'], \
            weather['low'], weather['high']
 
 
@@ -76,7 +80,7 @@ def get_jsyyh():
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
-airquality, wea, temperature, humidity, wind, low, high = get_weather()
+airquality, wea, humidity, wind, low, high = get_weather()
 tem = str(low) + "~" + str(high) + " ℃"
 print(tem)
 eng, chinese = get_jsyyh()
