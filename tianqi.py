@@ -30,12 +30,22 @@ def get_weather():
 
     if current_hour <= 12:
         weather = res['data']['list'][0]  # 今天
+        data = "今日风的属性属于" + weather['wind'] + "\n再重复一次哦，今日最低气温只有" + weather['low'] + "℃，注意你的温度控制，OK？"
+        
     elif current_hour > 12:
+        weather0 = res['data']['list'][0]
         weather = res['data']['list'][1]  # 明天
         weather1 = res['data']['list'][2]  # 后天
+        diffence = weather['low'] - weather0['low']
+        if(difference > 0):
+            data = "明较今高了" + difference + "℃\n" +
+                   "最低气温是" + weather['low'] + "哦，虽然高了一些，但还是注意保暖哦" 
+        else:
+            data = "明较今低了" + difference + "℃\n" +
+                   "最低气温只有" + weather['low'] + "哦，裹紧你的小棉袄" 
 
     return weather['airQuality'], weather['weather'], weather['humidity'], weather['wind'], \
-           weather['low'], weather['high']
+           weather['low'], weather['high'], data
 
 
 def get_birthday():
@@ -81,7 +91,7 @@ def get_jsyyh():
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
-airquality, wea, humidity, wind, low, high = get_weather()
+airquality, wea, humidity, wind, low, high, w_data = get_weather()
 tem = str(low) + "~" + str(high) + " ℃"
 print(tem)
 eng, chinese = get_jsyyh()
@@ -90,7 +100,7 @@ data = {"airquality": {"value": airquality}, "weather": {"value": wea},
         "temperature": {"value": tem, "color": get_random_color()}, "humidity": {"value": humidity},
         "wind": {"value": wind}, "birthday": {"value": birthday_left, "color": get_random_color()},
         "eng": {"value": eng, "color": get_random_color()}, "chinese": {"value": chinese},
-        "words": {"value": get_words(), "color": get_random_color()}}
+        "words": {"value": get_words(), "color": get_random_color()}, "w_data": {"value": w_data, "color": get_random_color()}}
 
 print(data)
 res = wm.send_template(user_id, template_id, data)
