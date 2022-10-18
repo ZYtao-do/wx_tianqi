@@ -22,6 +22,7 @@ user_id = os.environ["USER_ID"]
 user_id1 = os.environ["USER_ID1"]
 template_id = os.environ["TEMPLATE_ID"]
 
+template_id_add = os.environ["TEMPLATE_ID_ADD"]
 
 def get_weather():
     url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
@@ -30,19 +31,26 @@ def get_weather():
 
     if current_hour <= 12:
         weather = res['data']['list'][0]  # 今天
-        data = "今日风的属性属于" + weather['wind'] + "\n再重复一次哦，今日最低气温只有" + weather['low'] + "℃，注意你的温度控制，OK？"
-        
+        data = "今日风的属性属于" + weather['wind']
+        data += "\n再重复一次哦，今天最低气温只有" + str(weather['low']) + "℃" + "，注意你的温度控制，OK？"
+
     elif current_hour > 12:
         weather0 = res['data']['list'][0]
         weather = res['data']['list'][1]  # 明天
         weather1 = res['data']['list'][2]  # 后天
         diffence = weather['low'] - weather0['low']
-        if(difference > 0):
-            data = "明较今高了" + difference + "℃\n" +
-                   "最低气温是" + weather['low'] + "哦，虽然高了一些，但还是注意保暖哦" 
+
+        data = "明日风的属性属于" + weather['wind']
+        if diffence > 0:
+            data += "\n帮你瞅着了，明较今高了" + str(diffence) + "℃\n" + "最低气温是" + str(weather['low']) + "℃，虽然高了一些，但还是注意保暖哦"
         else:
-            data = "明较今低了" + difference + "℃\n" +
-                   "最低气温只有" + weather['low'] + "哦，裹紧你的小棉袄" 
+            data += "\n帮你瞅着了，明较今低了" + str(diffence) + "℃\n" + "最低气温只有" + str(weather['low']) + "℃哦，裹紧你的小棉袄"
+
+        wind_level = "".join([x for x in weather['wind'] if x.isdigit()])
+        if wind_level != "":
+            print(wind_level)
+            if int(wind_level) >= 5:
+                data.join("\n再次提醒哈，风力有" + str(wind_level) + "级哈，别被吹跑喽")
 
     return weather['airQuality'], weather['weather'], weather['humidity'], weather['wind'], \
            weather['low'], weather['high'], data
@@ -100,9 +108,10 @@ data = {"airquality": {"value": airquality}, "weather": {"value": wea},
         "temperature": {"value": tem, "color": get_random_color()}, "humidity": {"value": humidity},
         "wind": {"value": wind}, "birthday": {"value": birthday_left, "color": get_random_color()},
         "eng": {"value": eng, "color": get_random_color()}, "chinese": {"value": chinese},
-        "words": {"value": get_words(), "color": get_random_color()}, "w_data": {"value": w_data, "color": get_random_color()}}
+        "words": {"value": get_words(), "color": get_random_color()},
+        "w_data": {"value": w_data, "color": get_random_color()}}
 
 print(data)
-res = wm.send_template(user_id, template_id, data)
-res = wm.send_template(user_id1, template_id, data)
+res = wm.send_template(user_id, template_id_add, data)
+res = wm.send_template(user_id1, template_id_add, data)
 print(res)
