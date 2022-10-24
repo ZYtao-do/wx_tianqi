@@ -29,12 +29,12 @@ def get_weather():
     res = requests.get(url).json()
     current_hour = datetime.now().hour
 
-    if current_hour <= 12:
+    if (current_hour + 8)% 24 <= 12:
         weather = res['data']['list'][0]  # 今天
         data = "今日风的属性属于" + weather['wind']
         data += "\n再重复一次哦，今天最低气温只有" + str(weather['low']) + "℃" + "，注意你的温度控制，OK？"
 
-    elif current_hour > 12:
+    elif (current_hour + 8)% 24 > 12:
         weather0 = res['data']['list'][0]
         weather = res['data']['list'][1]  # 明天
         weather1 = res['data']['list'][2]  # 后天
